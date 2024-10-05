@@ -8,9 +8,13 @@ import com.semicolon.africa.dto.response.LoginCustomerResponse;
 import com.semicolon.africa.dto.response.SignupCustomerResponse;
 import com.semicolon.africa.exception.CustomerDoesNotExistException;
 import com.semicolon.africa.exception.EmailAlreadyExistException;
+import com.semicolon.africa.exception.EmptyFieldsInputException;
+import com.semicolon.africa.exception.InvalidPasswordException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import static com.semicolon.africa.utils.Mapper.map;
 
 @Service
 public class CustomerServiceImpl implements  CustomerService{
@@ -27,9 +31,12 @@ public class CustomerServiceImpl implements  CustomerService{
     public SignupCustomerResponse signupCustomer(SignupCustomerRequest signupCustomerRequest) {
         validateCustomerEmail(signupCustomerRequest.getEmail());
         Customer customer = new Customer();
-        customer.setFullName(signupCustomerRequest.getFullName());
-        customer.setGender(signupCustomerRequest.getGender().MALE);
-        customer.setEmail(signupCustomerRequest.getEmail());
+        if (isValueNullOrEmpty(signupCustomerRequest.getFullName())||
+                isValueNullOrEmpty(signupCustomerRequest.getEmail()) ||
+                isValueNullOrEmpty(signupCustomerRequest.getPassword())) {
+            throw new EmptyFieldsInputException("Please enter all fields ");
+        }
+        map(signupCustomerRequest, customer);
         customer.setPassword(passwordEncoder.encode(signupCustomerRequest.getPassword()));
         customerRepository.save(customer);
         SignupCustomerResponse signupCustomerResponse = new SignupCustomerResponse();
@@ -39,6 +46,11 @@ public class CustomerServiceImpl implements  CustomerService{
         signupCustomerResponse.setMessage("Successfully registered");
         return signupCustomerResponse;
     }
+
+    private boolean isValueNullOrEmpty(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
 
     private void validateCustomerEmail(String email) {
         boolean isCustomerEmailExist = customerRepository.existsByEmail(email);
@@ -52,6 +64,7 @@ public class CustomerServiceImpl implements  CustomerService{
         Customer customer = findCustomerByEmail(loginCustomerRequest.getEmail());
         customer.setEmail(loginCustomerRequest.getEmail());
         customer.setPassword(loginCustomerRequest.getPassword());
+        validateCustomerPassword(loginCustomerRequest.getPassword());
         customerRepository.save(customer);
         LoginCustomerResponse loginCustomerResponse = new LoginCustomerResponse();
         loginCustomerResponse.setEmail(customer.getEmail());
@@ -61,8 +74,18 @@ public class CustomerServiceImpl implements  CustomerService{
         return loginCustomerResponse;
     }
 
+    private void validateCustomerPassword(String password) {
+        boolean  isValidPassword = customerRepository
+                .findCustomerByPassword(String.valueOf(password.matches(password)));
+        if (!isValidPassword){
+            throw new InvalidPasswordException("Wrong password or email");
+        }
+    }
+
     private Customer findCustomerByEmail(String email) {
         return customerRepository.findCustomerByEmail(email)
                 .orElseThrow(()-> new CustomerDoesNotExistException("Customer does not exist"));
     }
 }
+
+
