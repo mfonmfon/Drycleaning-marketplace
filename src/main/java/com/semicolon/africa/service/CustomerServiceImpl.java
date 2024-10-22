@@ -147,8 +147,14 @@ public class CustomerServiceImpl implements  CustomerService{
 
     @Override
     public UpdateCustomersOrderResponse updateOrder(UpdateCustomerOrderRequest updateCustomerOrderRequest) {
-
-        return null;
+        Customer customer = customerRepository.findCustomerById(updateCustomerOrderRequest.getId());
+        customer.setEmail(updateCustomerOrderRequest.getEmail());
+        customer.setPhoneNumber(updateCustomerOrderRequest.getPhoneNumber());
+        customer.setHomeAddress(updateCustomerOrderRequest.getHomeAddress());
+        customerRepository.save(customer);
+        UpdateCustomersOrderResponse updateCustomersOrderResponse = new UpdateCustomersOrderResponse();
+        updateCustomersOrderResponse.setMessage("Customer order updated");
+        return updateCustomersOrderResponse;
     }
 
 
