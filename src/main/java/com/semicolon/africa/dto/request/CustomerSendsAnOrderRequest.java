@@ -17,6 +17,7 @@ public class CustomerSendsAnOrderRequest {
     private String homeAddress;
     private String email;
     private Long orderId;
+    private Long dryCleanerId;
 
 //    @Enumerated(EnumType.STRING)
 //    private ServiceType serviceType;

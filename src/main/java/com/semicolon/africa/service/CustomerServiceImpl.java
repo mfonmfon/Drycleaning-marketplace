@@ -9,16 +9,15 @@ import com.semicolon.africa.dto.request.CustomerSendsAnOrderRequest;
 import com.semicolon.africa.dto.request.LoginCustomerRequest;
 import com.semicolon.africa.dto.request.SignupCustomerRequest;
 import com.semicolon.africa.dto.request.UpdateCustomerOrderRequest;
-import com.semicolon.africa.dto.response.CustomerSendsAnOrderResponse;
-import com.semicolon.africa.dto.response.LoginCustomerResponse;
-import com.semicolon.africa.dto.response.SignupCustomerResponse;
-import com.semicolon.africa.dto.response.UpdateCustomersOrderResponse;
+import com.semicolon.africa.dto.response.*;
 import com.semicolon.africa.exception.*;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service
@@ -34,6 +33,7 @@ public class CustomerServiceImpl implements  CustomerService{
 
     private final OrderService orderService;
     private final DryCleanerRepository dryCleanerRepository;
+    private final DryCleanerService dryCleanerService;
 
     @Override
     public SignupCustomerResponse signupCustomer(SignupCustomerRequest signupCustomerRequest) {
@@ -122,23 +122,32 @@ public class CustomerServiceImpl implements  CustomerService{
 
     @Override
     public CustomerSendsAnOrderResponse sendOrder(CustomerSendsAnOrderRequest sendAnOrderRequest) {
-        Order order  = new Order();
-        order.setServiceType();
+        Order order  =  orderService.findOrderBy(sendAnOrderRequest.getOrderId());
+        if (order == null){
+            throw new EmptyOrderException("No order was found ");
+        }
+        DryCleaner dryCleaner = dryCleanerService.findDryCleanerBy(sendAnOrderRequest.getDryCleanerId());
+        if (dryCleaner == null){
+            throw new NoDryCleanerWasFound("No dry cleaner was found ");
+        }
         Customer customer = new Customer();
         customer.setEmail(sendAnOrderRequest.getEmail());
         customer.setPhoneNumber(sendAnOrderRequest.getPhoneNumber());
         customer.setHomeAddress(sendAnOrderRequest.getHomeAddress());
+        List<Order> orderList = customer.getOrders();
+        orderList.add(order);
+        customerRepository.save(customer);
         CustomerSendsAnOrderResponse sendsAnOrderResponse = new CustomerSendsAnOrderResponse();
-        sendsAnOrderResponse.setCustomerId(customer.getId());
         sendsAnOrderResponse.setEmail(customer.getEmail());
         sendsAnOrderResponse.setPhoneNumber(customer.getPhoneNumber());
         sendsAnOrderResponse.setHomeAddress(customer.getHomeAddress());
         sendsAnOrderResponse.setMessage("Order sent ");
-        return null;
+        return  sendsAnOrderResponse;
     }
 
     @Override
     public UpdateCustomersOrderResponse updateOrder(UpdateCustomerOrderRequest updateCustomerOrderRequest) {
+
         return null;
     }
 
