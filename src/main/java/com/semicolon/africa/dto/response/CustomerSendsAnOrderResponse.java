@@ -12,16 +12,14 @@ import java.time.LocalDateTime;
 @Setter
 public class CustomerSendsAnOrderResponse {
     private Long customerId;
-    private String fullName;
     private String phoneNumber;
-    private String city;
-    private String street;
-    private String country;
-    @Enumerated(EnumType.STRING)
-    private ServiceType serviceType;
-    @Enumerated(EnumType.STRING)
-    private ItemsType itemsType;
-    private String detailedInstructions;
+    private String homeAddress;
+    private String email;
+//    @Enumerated(EnumType.STRING)
+//    private ServiceType serviceType;
+//    @Enumerated(EnumType.STRING)
+//    private ItemsType itemsType;
+//    private String detailedInstructions;
     private LocalDateTime dateSent;
     private String message;
 }

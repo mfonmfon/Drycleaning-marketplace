@@ -14,15 +14,20 @@ public class DryCleaner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Long customerId;
     private String fullName;
     private String email;
-    private Gender gender;
     private String password;
     private String phoneNumber;
-    private String city;
-    private String street;
-    private String country;
+    private String homeAddress;
     private LocalDateTime finishedAt;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Customer customer;
+
     @OneToMany
    private List<Customer> customers;
+
+    @OneToMany
+    private List<Rider> riders;
 }

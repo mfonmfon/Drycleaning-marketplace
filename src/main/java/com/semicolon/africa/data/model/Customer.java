@@ -18,18 +18,13 @@ public class Customer {
     private Long OrderId;
     private String fullName;
     private String email;
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
     private String password;
     private String phoneNumber;
-    @Enumerated(EnumType.STRING)
-    private ServiceType serviceType;
-    @Enumerated(EnumType.STRING)
-    private ItemsType itemsType;
-    private String detailedInstructions;
-    private String city;
-    private String street;
-    private String country;
+    private String homeAddress;
     private LocalDateTime dateSent;
     private LocalDateTime dateUpdated;
+    @OneToMany
+    List <Order> orders;
+    @OneToMany
+    List<Rider> riders;
 }

@@ -14,14 +14,16 @@ public class Rider {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
+    private Long customerId;
+    private Long dryCleanerId;
     private String fullName;
     private String email;
-    private Gender gender;
     private String password;
     private String phoneNumber;
     private String homeAddress;
-    private String city;
-    private String street;
-    private String country;
-    private LocalDateTime deliveredAt;
+    private LocalDateTime pickedUpAt;
+    @OneToMany
+    private List<DryCleaner> dryCleaners;
+    @OneToMany
+    private List<Customer> customers;
 }

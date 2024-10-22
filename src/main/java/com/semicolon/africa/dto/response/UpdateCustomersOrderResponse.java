@@ -11,13 +11,10 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class UpdateCustomersOrderResponse {
-    private Long orderId;
     private Long customerId;
+    private Long orderId;
     private String fullName;
     private String phoneNumber;
-    private String city;
-    private String street;
-    private String country;
     @Enumerated(EnumType.STRING)
     private ServiceType serviceType;
     @Enumerated(EnumType.STRING)

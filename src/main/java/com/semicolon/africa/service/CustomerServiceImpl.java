@@ -1,7 +1,10 @@
 package com.semicolon.africa.service;
-
 import com.semicolon.africa.data.model.Customer;
+import com.semicolon.africa.data.model.DryCleaner;
+import com.semicolon.africa.data.model.Order;
 import com.semicolon.africa.data.repository.CustomerRepository;
+import com.semicolon.africa.data.repository.DryCleanerRepository;
+import com.semicolon.africa.data.repository.OrderRepository;
 import com.semicolon.africa.dto.request.CustomerSendsAnOrderRequest;
 import com.semicolon.africa.dto.request.LoginCustomerRequest;
 import com.semicolon.africa.dto.request.SignupCustomerRequest;
@@ -10,126 +13,135 @@ import com.semicolon.africa.dto.response.CustomerSendsAnOrderResponse;
 import com.semicolon.africa.dto.response.LoginCustomerResponse;
 import com.semicolon.africa.dto.response.SignupCustomerResponse;
 import com.semicolon.africa.dto.response.UpdateCustomersOrderResponse;
-import com.semicolon.africa.exception.CustomerDoesNotExistException;
-import com.semicolon.africa.exception.EmailAlreadyExistException;
-import com.semicolon.africa.exception.EmptyFieldsInputException;
-import com.semicolon.africa.exception.InvalidPasswordException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.semicolon.africa.exception.*;
+import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import static com.semicolon.africa.utils.Mapper.*;
 
 @Service
+@RequiredArgsConstructor
 public class CustomerServiceImpl implements  CustomerService{
 
-    private static final Logger log = LoggerFactory.getLogger(CustomerServiceImpl.class);
-    @Autowired
-    private  CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
+    private final PasswordEncoder passwordEncoder;
+
+    private final OrderRepository orderRepository;
+
+    private final OrderService orderService;
+    private final DryCleanerRepository dryCleanerRepository;
 
     @Override
     public SignupCustomerResponse signupCustomer(SignupCustomerRequest signupCustomerRequest) {
-        validateCustomerEmail(signupCustomerRequest.getEmail());
-        Customer customer = new Customer();
-        if (isValueNullOrEmpty(signupCustomerRequest.getFullName())||
-                isValueNullOrEmpty(signupCustomerRequest.getEmail()) ||
-                isValueNullOrEmpty(signupCustomerRequest.getPassword())) {
-            throw new EmptyFieldsInputException("Please enter all fields ");
+        validateCustomerPassword(signupCustomerRequest.getPassword());
+        Customer customer = customerSignupRequest(signupCustomerRequest);
+        if (isValueEmptyOrNull(signupCustomerRequest.getFullName())||
+                isValueEmptyOrNull(signupCustomerRequest.getEmail())||
+                isValueEmptyOrNull(signupCustomerRequest.getPhoneNumber())||
+                isValueEmptyOrNull(signupCustomerRequest.getHomeAddress())||
+                isValueEmptyOrNull(signupCustomerRequest.getPassword())){
+            throw new EmptyFieldsInputException(" Must fill this field ");
         }
-        map(signupCustomerRequest, customer);
-        customer.setPassword(passwordEncoder.encode(signupCustomerRequest.getPassword()));
+        if (!(signupCustomerRequest.getEmail().contains("@")|| signupCustomerRequest.getEmail().contains("."))){
+            throw new InvalidEmailException("Invalid email format, email must include @ and .");
+        }
+        validateCustomerEmail(signupCustomerRequest.getEmail());
         customerRepository.save(customer);
+        return getSignupCustomerResponse(customer);
+    }
+
+    private void validateCustomerEmailAddress(String email) {
+        boolean isEmailExist = customerRepository.existsByEmail(email);
+        if (isEmailExist){
+            throw new EmailAlreadyExistException("Email already exist");
+        }
+    }
+
+    private static SignupCustomerResponse getSignupCustomerResponse(Customer customer) {
         SignupCustomerResponse signupCustomerResponse = new SignupCustomerResponse();
         signupCustomerResponse.setFullName(customer.getFullName());
-        signupCustomerResponse.setGender(customer.getGender().MALE);
+        signupCustomerResponse.setEmail(customer.getEmail());
+        signupCustomerResponse.setPhoneNumber(customer.getPhoneNumber());
+        signupCustomerResponse.setHomeAddress(customer.getHomeAddress());
         signupCustomerResponse.setPassword(customer.getPassword());
         signupCustomerResponse.setMessage("Successfully registered");
         return signupCustomerResponse;
     }
 
-    private boolean isValueNullOrEmpty(String value) {
+    private Customer customerSignupRequest(SignupCustomerRequest signupCustomerRequest) {
+        Customer customer = new Customer();
+        customer.setFullName(signupCustomerRequest.getFullName());
+        customer.setEmail(signupCustomerRequest.getEmail());
+        customer.setPhoneNumber(signupCustomerRequest.getPhoneNumber());
+        customer.setHomeAddress(signupCustomerRequest.getHomeAddress());
+        customer.setPassword(passwordEncoder.encode(signupCustomerRequest.getPassword()));
+        return customer;
+    }
+
+    private boolean isValueEmptyOrNull(String value) {
         return value == null || value.trim().isEmpty();
     }
-
-    private void validateCustomerEmail(String email) {
-        boolean isCustomerEmailExist = customerRepository.existsByEmail(email);
-        if (isCustomerEmailExist){
-            throw new EmailAlreadyExistException("Email already exists");
-        }
-    }
-
     @Override
     public LoginCustomerResponse loginCustomer(LoginCustomerRequest loginCustomerRequest) {
-        Customer customer = findCustomerByEmail(loginCustomerRequest.getEmail());
-        customer.setEmail(loginCustomerRequest.getEmail());
+
+        Customer customer = new Customer();
+        customer.setEmail(validateCustomerEmail(loginCustomerRequest.getEmail()));
         customer.setPassword(loginCustomerRequest.getPassword());
-        validateCustomerPassword(loginCustomerRequest.getPassword());
+        if (!(loginCustomerRequest.getEmail().contains("@")|| loginCustomerRequest.getEmail().contains("."))){
+            throw new InvalidEmailException("Invalid email");
+
+        }
         customerRepository.save(customer);
         LoginCustomerResponse loginCustomerResponse = new LoginCustomerResponse();
         loginCustomerResponse.setEmail(customer.getEmail());
-        loginCustomerResponse.setPassword(customer.getPassword());
+        loginCustomerResponse.setPassword((loginCustomerResponse.getPassword()));
         loginCustomerResponse.setLoggedIn(true);
-        loginCustomerResponse.setMessage("You're logged in");
+        loginCustomerResponse.setMessage("Logged in successfully");
         return loginCustomerResponse;
+    }
+
+    private String validateCustomerEmail(String email) {
+        Customer customer = customerRepository.findCustomerByEmail(email);
+        if (customer == null){
+            throw new CustomerNotFoundException("Customer not found ");
+        }
+        if (email == null || email.isEmpty()){
+            throw new EmptyFieldsInputException("Email can not be empty");
+        }
+        return customer.getEmail();
+    }
+
+    private Customer validateCustomerPassword(String password) {
+       return customerRepository.findCustomerByPassword(password)
+               .orElseThrow(()-> new InvalidPasswordException("Password does not exist"));
     }
 
     @Override
     public CustomerSendsAnOrderResponse sendOrder(CustomerSendsAnOrderRequest sendAnOrderRequest) {
+        Order order  = new Order();
+        order.setServiceType();
         Customer customer = new Customer();
-        if (isValueNullOrEmpty(sendAnOrderRequest.getFullName())||
-                isValueNullOrEmpty(sendAnOrderRequest.getPhoneNumber())||
-                isValueNullOrEmpty(sendAnOrderRequest.getStreet())||
-                isValueNullOrEmpty(sendAnOrderRequest.getCity())||
-                isValueNullOrEmpty(sendAnOrderRequest.getCountry())||
-                isValueNullOrEmpty(sendAnOrderRequest.getDetailedInstructions())){
-            throw new EmptyFieldsInputException("please fill all the fields before proceeding to the next");
-
-        }
-        customerRepository.save(customer);
-        customerSendsOrderRequestMap(sendAnOrderRequest, customer);
-        return mapSendOrderResponse(sendAnOrderRequest, customer);
+        customer.setEmail(sendAnOrderRequest.getEmail());
+        customer.setPhoneNumber(sendAnOrderRequest.getPhoneNumber());
+        customer.setHomeAddress(sendAnOrderRequest.getHomeAddress());
+        CustomerSendsAnOrderResponse sendsAnOrderResponse = new CustomerSendsAnOrderResponse();
+        sendsAnOrderResponse.setCustomerId(customer.getId());
+        sendsAnOrderResponse.setEmail(customer.getEmail());
+        sendsAnOrderResponse.setPhoneNumber(customer.getPhoneNumber());
+        sendsAnOrderResponse.setHomeAddress(customer.getHomeAddress());
+        sendsAnOrderResponse.setMessage("Order sent ");
+        return null;
     }
 
     @Override
     public UpdateCustomersOrderResponse updateOrder(UpdateCustomerOrderRequest updateCustomerOrderRequest) {
-        Customer customer = findCustomerById(updateCustomerOrderRequest.getId());
-        updateRequestMapping(updateCustomerOrderRequest, customer);
-        if (isValueNullOrEmpty(updateCustomerOrderRequest.getFullName())||
-                isValueNullOrEmpty(updateCustomerOrderRequest.getPhoneNumber())||
-                isValueNullOrEmpty(updateCustomerOrderRequest.getStreet())||
-                isValueNullOrEmpty(updateCustomerOrderRequest.getCity())||
-                isValueNullOrEmpty(updateCustomerOrderRequest.getCity())||
-                isValueNullOrEmpty(updateCustomerOrderRequest.getDetailedInstructions())){
-            throw new EmptyFieldsInputException("Please input all fields");
-        }
-        customerRepository.save(customer);
-        return mapUpdateOrderResponse(updateCustomerOrderRequest, customer);
+        return null;
     }
 
-    private Customer findCustomerById(Long id) {
-        return customerRepository.findById(id)
-                .orElseThrow(()->new CustomerDoesNotExistException("Customer id does not exist"));
-    }
-
-
-    private void validateCustomerPassword(String password) {
-        boolean  isValidPassword = customerRepository
-                .findCustomerByPassword(String.valueOf(password.matches(password)));
-        if (!isValidPassword){
-            throw new InvalidPasswordException("Wrong password or email");
-        }
-    }
-
-    private Customer findCustomerByEmail(String email) {
-        return customerRepository.findCustomerByEmail(email)
-                .orElseThrow(()-> new CustomerDoesNotExistException("Customer does not exist"));
-    }
 
 /**
  * Docker, Kubernates, k9s
