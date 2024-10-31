@@ -3,27 +3,21 @@ package com.semicolon.africa.data.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
-import java.util.List;
+import org.hibernate.annotations.ManyToAny;
 
 @Getter
 @Setter
 @Entity
 public class Rider {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long customerId;
-    private Long dryCleanerId;
-    private String fullName;
-    private String email;
-    private String password;
+    private String firstName;
+    private String lastName;
     private String phoneNumber;
-    private String homeAddress;
-    private LocalDateTime pickedUpAt;
-    @OneToMany
-    private List<DryCleaner> dryCleaners;
-    @OneToMany
-    private List<Customer> customers;
+    private String address;
+    private boolean isAvailable;
+    @ManyToOne
+    @JoinColumn(name = "drycleaner_id")
+    private DryCleaner Drycleaner;
 }

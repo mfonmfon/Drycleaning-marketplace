@@ -1,12 +1,13 @@
 package com.semicolon.africa.data.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.security.Provider;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -15,17 +16,17 @@ public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long OrderId;
-    private Long dryCleanerId;
-    private String fullName;
+    @NotBlank(message = "FirstName is required")
+    @Size(min = 2, max = 30, message = "Name must be between 2 and 30")
+    private String firstName;
+    @NotBlank(message = "LastName is required")
+    @Size(min = 2, max = 30, message = "LastName must be between 2 and 30")
+    private String lastName;
+    @NotBlank(message = "Email is required")
     private String email;
-    private String password;
+    @NotBlank(message = "PhoneNumber is required")
+    @Size(min = 1, max = 11)
     private String phoneNumber;
-    private String homeAddress;
-    private LocalDateTime dateSent;
-    private LocalDateTime dateUpdated;
-    @OneToMany
-    List <Order> orders;
-    @OneToMany
-    List<Rider> riders;
+    //write the code here
+    
 }
