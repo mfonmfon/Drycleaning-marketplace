@@ -52,10 +52,7 @@ public class DryCleanerServiceImpl implements DryCleanerService {
     @Override
     public DryCleanerUpdateOrderResponse updateOrder(DryCleanerUpdateOrderRequest dryCleanerUpdateOrderRequest) {
         DryCleaner dryCleaner = findDryCleanerById(dryCleanerUpdateOrderRequest.getDryCleanerId());
-        if(dryCleaner.getFirstName().isEmpty() ||
-                dryCleaner.getFirstName().isEmpty()||
-                dryCleaner.getLastName().isEmpty()|| dryCleaner.getCompanyName().isEmpty() ||
-                dryCleaner.getPhoneNumber().isEmpty()|| dryCleaner.getEmail().isEmpty()){
+        if(dryCleaner == null){
             throw new InvalidOrEmptyFieldsException("Field must not be null");
         }
         dryCleaner.setFirstName(dryCleanerUpdateOrderRequest.getFirstName());
@@ -99,11 +96,10 @@ public class DryCleanerServiceImpl implements DryCleanerService {
         dryCleanerRegisterResponse.setMessage("Hello Registered successfully");
         return dryCleanerRegisterResponse;
     }
-
     private void validateDryCleanerEmailAddress(String email) {
         boolean isDryCleanerExist = dryCleanerRepository.existsByEmail(email);
         if(isDryCleanerExist){
-            throw new DryCleanerDoesNotExist("Dry Cleaner already exist");
+            throw new DryCleanerAlreadyExistException("Dry Cleaner already exist");
         }
     }
     @Override
