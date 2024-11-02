@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import static com.semicolon.africa.utils.Mapper.getDryCleanerUpdateOrderResponse;
 import static com.semicolon.africa.utils.Mapper.map;
 
 @Service
@@ -33,28 +34,43 @@ public class DryCleanerServiceImpl implements DryCleanerService {
     public DryCleanerAddOrderResponse sendOrder(DryCleanerAddOrderRequest dryCleanerAddOrderRequest) {
         validateDryCleanerEmailAddress(dryCleanerAddOrderRequest.getEmail());
         DryCleaner dryCleaner = new DryCleaner();
-        if(dryCleaner.getFirstName().isEmpty() ||
-                dryCleaner.getFirstName().isEmpty()|| dryCleaner.getLastName().isEmpty()|| dryCleaner.getCompanyName().isEmpty() ||
-                dryCleaner.getPhoneNumber().isEmpty()|| dryCleaner.getEmail().isEmpty()){
+        if(dryCleaner == null){
             throw new InvalidOrEmptyFieldsException("Field must not be null");
         }
-        validateDryCleanerLogin(dryCleaner.isLoggedIn());
         map(dryCleanerAddOrderRequest, dryCleaner);
+        validateDryCleanerLogin(dryCleaner);
         dryCleanerRepository.save(dryCleaner);
         DryCleanerAddOrderResponse dryCleanerAddOrderResponse = new DryCleanerAddOrderResponse();
         dryCleanerAddOrderResponse.setDryCleanerId(dryCleaner.getId());
         dryCleanerAddOrderResponse.setMessage("Ordered sent successfully");
         return dryCleanerAddOrderResponse;
     }
-
-    private void validateDryCleanerLogin(boolean loggedIn) {
-        DryCleaner dryCleaner = new DryCleaner();
+    private void validateDryCleanerLogin(DryCleaner  dryCleaner) {
         if(!dryCleaner.isLoggedIn())throw new DryCleanerNotLoggedInException("Login first");
     }
 
     @Override
     public DryCleanerUpdateOrderResponse updateOrder(DryCleanerUpdateOrderRequest dryCleanerUpdateOrderRequest) {
-        return null;
+        DryCleaner dryCleaner = findDryCleanerById(dryCleanerUpdateOrderRequest.getDryCleanerId());
+        if(dryCleaner.getFirstName().isEmpty() ||
+                dryCleaner.getFirstName().isEmpty()||
+                dryCleaner.getLastName().isEmpty()|| dryCleaner.getCompanyName().isEmpty() ||
+                dryCleaner.getPhoneNumber().isEmpty()|| dryCleaner.getEmail().isEmpty()){
+            throw new InvalidOrEmptyFieldsException("Field must not be null");
+        }
+        dryCleaner.setFirstName(dryCleanerUpdateOrderRequest.getFirstName());
+        dryCleaner.setLastName(dryCleanerUpdateOrderRequest.getLastName());
+        dryCleaner.setCompanyName(dryCleanerUpdateOrderRequest.getCompanyName());
+        dryCleaner.setPhoneNumber(dryCleanerUpdateOrderRequest.getPhoneNumber());
+        dryCleaner.setEmail(dryCleanerUpdateOrderRequest.getEmail());
+        dryCleanerRepository.save(dryCleaner);
+        DryCleanerUpdateOrderResponse dryCleanerUpdateOrderResponse = getDryCleanerUpdateOrderResponse();
+        return dryCleanerUpdateOrderResponse;
+    }
+    
+    private DryCleaner findDryCleanerById(Long dryCleanerId) {
+        return dryCleanerRepository.findDryCleanerById(dryCleanerId).
+                orElseThrow(()-> new DryCleanerIdNotFoundException("Dry cleaner not found id"));
     }
 
     @Override
@@ -72,6 +88,10 @@ public class DryCleanerServiceImpl implements DryCleanerService {
         dryCleaner.setPassword(passwordEncoder.encode(dryCleanerRegisterRequest.getPassword()));
         dryCleanerRepository.save(dryCleaner);
         DryCleanerRegisterResponse  dryCleanerRegisterResponse = new DryCleanerRegisterResponse();
+        return dryCleanerRegisterResponseMapper(dryCleanerRegisterResponse, dryCleaner);
+    }
+
+    private static DryCleanerRegisterResponse dryCleanerRegisterResponseMapper(DryCleanerRegisterResponse dryCleanerRegisterResponse, DryCleaner dryCleaner) {
         dryCleanerRegisterResponse.setDryCleanerId(dryCleaner.getId());
         dryCleanerRegisterResponse.setEmail(dryCleaner.getEmail());
         dryCleanerRegisterResponse.setPhoneNumber(dryCleaner.getPhoneNumber());
@@ -79,7 +99,6 @@ public class DryCleanerServiceImpl implements DryCleanerService {
         dryCleanerRegisterResponse.setMessage("Hello Registered successfully");
         return dryCleanerRegisterResponse;
     }
-
 
     private void validateDryCleanerEmailAddress(String email) {
         boolean isDryCleanerExist = dryCleanerRepository.existsByEmail(email);
@@ -91,8 +110,9 @@ public class DryCleanerServiceImpl implements DryCleanerService {
     public DryCleanerLoginResponse login(DryCleanerLoginRequest dryCleanerLoginRequest) {
         DryCleaner dryCleaner = findDryCleanerByEmail(dryCleanerLoginRequest.getEmail());
         dryCleaner.setEmail(dryCleanerLoginRequest.getEmail());
-        validateDryCleanerPasword(dryCleaner,dryCleanerLoginRequest.getPassword());
+        validateDryCleanerPassword(dryCleaner,dryCleanerLoginRequest.getPassword());
         dryCleaner.setPassword((dryCleanerLoginRequest.getPassword()));
+        dryCleaner.setLoggedIn(true);
         dryCleanerRepository.save(dryCleaner);
         DryCleanerLoginResponse loginDryCleanerResponse = new DryCleanerLoginResponse();
         loginDryCleanerResponse.setEmail(dryCleaner.getEmail());
@@ -101,10 +121,10 @@ public class DryCleanerServiceImpl implements DryCleanerService {
         return loginDryCleanerResponse;
     }
 
-    private void validateDryCleanerPasword(DryCleaner dryCleaner, String password) {
+
+    private void validateDryCleanerPassword(DryCleaner dryCleaner, String password) {
         if(passwordEncoder.matches(dryCleaner.getPassword(), password)) throw new InCorrectPassword("Invalid dry-cleaner password");
     }
-
 
     private DryCleaner findDryCleanerByEmail(String dryCleanerEmail) {
         return dryCleanerRepository.findDryCleanerByEmail(dryCleanerEmail)

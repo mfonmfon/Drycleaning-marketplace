@@ -3,9 +3,11 @@ package com.semicolon.africa.service.interfaces;
 import com.semicolon.africa.DTOs.request.DryCleanerAddOrderRequest;
 import com.semicolon.africa.DTOs.request.DryCleanerLoginRequest;
 import com.semicolon.africa.DTOs.request.DryCleanerRegisterRequest;
+import com.semicolon.africa.DTOs.request.DryCleanerUpdateOrderRequest;
 import com.semicolon.africa.DTOs.response.DryCleanerAddOrderResponse;
 import com.semicolon.africa.DTOs.response.DryCleanerLoginResponse;
 import com.semicolon.africa.DTOs.response.DryCleanerRegisterResponse;
+import com.semicolon.africa.DTOs.response.DryCleanerUpdateOrderResponse;
 import com.semicolon.africa.data.repository.DryCleanerRepository;
 import com.semicolon.africa.exception.InvalidOrEmptyFieldsException;
 import lombok.RequiredArgsConstructor;
@@ -43,10 +45,10 @@ class DryCleanerServiceTest {
 
     private static DryCleanerAddOrderRequest SendOrder() {
         DryCleanerAddOrderRequest dryCleanerAddOrderRequest = new DryCleanerAddOrderRequest();
-        dryCleanerAddOrderRequest.setFirstName("Mfon Mfon");
+        dryCleanerAddOrderRequest.setFirstName("Mfon");
         dryCleanerAddOrderRequest.setLastName("Mfon");
         dryCleanerAddOrderRequest.setEmail("mfonm579@gmail.com");
-        dryCleanerAddOrderRequest.setPhoneNumber("081231156");
+        dryCleanerAddOrderRequest.setPhoneNumber("08123115688");
         dryCleanerAddOrderRequest.setCompanyName("FonDryer");
         return dryCleanerAddOrderRequest;
     }
@@ -101,14 +103,40 @@ class DryCleanerServiceTest {
         DryCleanerRegisterResponse dryCleanerRegisterResponse = dryCleanerService.register(registerDryCleaner());
         assertEquals(1, dryCleanerRepository.count());
         assertThat(dryCleanerRegisterResponse.getMessage()).contains("Hello Registered successfully");
-        DryCleanerLoginRequest loginRequest = new DryCleanerLoginRequest();
-        loginRequest.setEmail("mfonm579@gmail.com");
-        loginRequest.setPassword("mfonm579");
+        DryCleanerLoginRequest loginRequest = loginRequest();
         DryCleanerLoginResponse loginResponse = dryCleanerService.login(loginRequest);
         assertThat(loginResponse).isNotNull();
         assertThat(loginResponse.getMessage()).contains("Login Successfully");
     }
 
+    private static DryCleanerLoginRequest loginRequest() {
+        DryCleanerLoginRequest loginRequest = new DryCleanerLoginRequest();
+        loginRequest.setEmail("mfonm579@gmail.com");
+        loginRequest.setPassword("mfonm579");
+        return loginRequest;
+    }
 
+    @Test
+    public void testThatDryCleanerCanUpdateOrders(){
+        registerDryCleaner();
+        DryCleanerRegisterResponse dryCleanerRegisterResponse = dryCleanerService.register(registerDryCleaner());
+        assertThat(dryCleanerRegisterResponse.getMessage()).contains("Hello Registered successfully");
+        loginRequest();
+        DryCleanerLoginResponse dryCleanerLoginResponse = dryCleanerService.login(loginRequest());
+        assertThat(dryCleanerLoginResponse.getMessage()).contains("Login Successfully");
+        SendOrder();
+        DryCleanerAddOrderResponse dryCleanerAddOrderResponse = dryCleanerService.sendOrder(SendOrder());
+        assertThat(dryCleanerAddOrderResponse.getMessage()).contains("Order sent successfully");
+        DryCleanerUpdateOrderRequest dryCleanerUpdateOrderRequest = new DryCleanerUpdateOrderRequest();
+        dryCleanerUpdateOrderRequest.setDryCleanerId(2L);
+        dryCleanerUpdateOrderRequest.setEmail("mfon@gmail.com");
+        dryCleanerUpdateOrderRequest.setFirstName("Mfon");
+        dryCleanerUpdateOrderRequest .setLastName("Mfon");
+        dryCleanerUpdateOrderRequest .setPhoneNumber("08123115688");
+        dryCleanerUpdateOrderRequest .setCompanyName("company");
+        DryCleanerUpdateOrderResponse dryCleanerUpdateOrderResponse = dryCleanerService.updateOrder(dryCleanerUpdateOrderRequest);
+        assertThat(dryCleanerUpdateOrderResponse.getMessage()).contains("order was successfully updated");
+        assertThat(dryCleanerUpdateOrderResponse).isNotNull();
+    }
 }
 

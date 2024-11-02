@@ -12,6 +12,7 @@ public class DryCleanerAddOrderResponse {
     private String lastName;
     private String email;
     private String phoneNumber;
+    private String companyName;
     private Rider rider;
     private String message;
 }

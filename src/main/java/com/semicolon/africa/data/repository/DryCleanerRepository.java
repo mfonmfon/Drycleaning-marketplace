@@ -10,4 +10,5 @@ public interface DryCleanerRepository extends JpaRepository<DryCleaner, Long> {
 
     Optional<DryCleaner> findDryCleanerByEmail(String email);
 
+    Optional <DryCleaner> findDryCleanerById(Long dryCleanerId);
 }
