@@ -7,10 +7,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DryCleanerRegisterResponse {
-    private Long id;
-    private String firstName;
-    private String lastName;
+    private Long dryCleanerId;
     private String email;
     private String phoneNumber;
-    private Rider rider;
+    private String password;
+    private String message;
+
 }

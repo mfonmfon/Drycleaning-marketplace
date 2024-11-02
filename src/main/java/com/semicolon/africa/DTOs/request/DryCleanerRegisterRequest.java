@@ -7,6 +7,8 @@ import lombok.Setter;
 @Setter
 public class DryCleanerRegisterRequest {
     private String email;
+    private String firstName;
     private String phoneNumber;
     private String password;
+
 }

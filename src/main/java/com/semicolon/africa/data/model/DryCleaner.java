@@ -3,8 +3,6 @@ package com.semicolon.africa.data.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ManyToAny;
-
 import java.util.List;
 
 @Getter
@@ -20,7 +18,9 @@ public class DryCleaner {
     private String companyName;
     private String phoneNumber;
     private String password;
+    private boolean isLoggedIn;
+    @OneToMany
+    private List<Customer> customers;
     @OneToMany
     private List<Rider> riders;
-
 }
