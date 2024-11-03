@@ -4,10 +4,7 @@ import com.semicolon.africa.DTOs.request.DryCleanerAddOrderRequest;
 import com.semicolon.africa.DTOs.request.DryCleanerLoginRequest;
 import com.semicolon.africa.DTOs.request.DryCleanerRegisterRequest;
 import com.semicolon.africa.DTOs.request.DryCleanerUpdateOrderRequest;
-import com.semicolon.africa.DTOs.response.DryCleanerAddOrderResponse;
-import com.semicolon.africa.DTOs.response.DryCleanerLoginResponse;
-import com.semicolon.africa.DTOs.response.DryCleanerRegisterResponse;
-import com.semicolon.africa.DTOs.response.DryCleanerUpdateOrderResponse;
+import com.semicolon.africa.DTOs.response.*;
 import com.semicolon.africa.data.repository.DryCleanerRepository;
 import com.semicolon.africa.exception.InvalidOrEmptyFieldsException;
 import lombok.RequiredArgsConstructor;
@@ -118,25 +115,54 @@ class DryCleanerServiceTest {
 
     @Test
     public void testThatDryCleanerCanUpdateOrders(){
-        registerDryCleaner();
-        DryCleanerRegisterResponse dryCleanerRegisterResponse = dryCleanerService.register(registerDryCleaner());
+        DryCleanerRegisterRequest dryCleanerRegisterRequest = new DryCleanerRegisterRequest();
+        dryCleanerRegisterRequest.setFirstName("Mfon");
+        dryCleanerRegisterRequest.setEmail("mfonm3579@gmail.com");
+        dryCleanerRegisterRequest.setPhoneNumber("08123115688");
+        dryCleanerRegisterRequest.setPassword("mfonm579");
+        DryCleanerRegisterResponse dryCleanerRegisterResponse = dryCleanerService.register(dryCleanerRegisterRequest);
         assertThat(dryCleanerRegisterResponse.getMessage()).contains("Hello Registered successfully");
-        loginRequest();
-        DryCleanerLoginResponse dryCleanerLoginResponse = dryCleanerService.login(loginRequest());
+        DryCleanerLoginRequest dryCleanerLoginRequest = new DryCleanerLoginRequest();
+        dryCleanerLoginRequest.setEmail("mfonm3579@gmail.com");
+        dryCleanerLoginRequest.setPassword("mfonm579");
+        DryCleanerLoginResponse dryCleanerLoginResponse = dryCleanerService.login(dryCleanerLoginRequest);
         assertThat(dryCleanerLoginResponse.getMessage()).contains("Login Successfully");
-        SendOrder();
-        DryCleanerAddOrderResponse dryCleanerAddOrderResponse = dryCleanerService.sendOrder(SendOrder());
+        DryCleanerAddOrderRequest dryCleanerAddOrderRequest = new DryCleanerAddOrderRequest();
+        dryCleanerAddOrderRequest.setFirstName("Mfon");
+        dryCleanerAddOrderRequest.setLastName("Mfon");
+        dryCleanerAddOrderRequest.setEmail("mfonm3579@gmail.com");
+        dryCleanerAddOrderRequest.setPhoneNumber("08123115688");
+        dryCleanerAddOrderRequest.setCompanyName("FonDryer");
+        DryCleanerAddOrderResponse dryCleanerAddOrderResponse = dryCleanerService.sendOrder(dryCleanerAddOrderRequest);
         assertThat(dryCleanerAddOrderResponse.getMessage()).contains("Order sent successfully");
         DryCleanerUpdateOrderRequest dryCleanerUpdateOrderRequest = new DryCleanerUpdateOrderRequest();
-        dryCleanerUpdateOrderRequest.setDryCleanerId(2L);
-        dryCleanerUpdateOrderRequest.setEmail("mfon@gmail.com");
+//        dryCleanerUpdateOrderRequest.setDryCleanerId(2L);
+        dryCleanerUpdateOrderRequest.setEmail("mfon3579@gmail.com");
         dryCleanerUpdateOrderRequest.setFirstName("Mfon");
-        dryCleanerUpdateOrderRequest .setLastName("Mfon");
+        dryCleanerUpdateOrderRequest .setLastName("Paul");
         dryCleanerUpdateOrderRequest .setPhoneNumber("08123115688");
         dryCleanerUpdateOrderRequest .setCompanyName("company");
         DryCleanerUpdateOrderResponse dryCleanerUpdateOrderResponse = dryCleanerService.updateOrder(dryCleanerUpdateOrderRequest);
         assertThat(dryCleanerUpdateOrderResponse.getMessage()).contains("order was successfully updated");
         assertThat(dryCleanerUpdateOrderResponse).isNotNull();
     }
-}
 
+
+
+    @Test
+    public void testThatDryCleanerCanDeleteOrders(){
+        registerDryCleaner();
+        DryCleanerRegisterResponse dryCleanerRegisterResponse = dryCleanerService.register(registerDryCleaner());
+        assertEquals(1, dryCleanerRepository.count());
+        assertThat(dryCleanerRegisterResponse.getMessage()).contains("Hello Registered successfully");
+       loginRequest();
+        DryCleanerLoginResponse dryCleanerLoginResponse = dryCleanerService.login(loginRequest());
+       assertThat(dryCleanerLoginResponse.getMessage()).contains("Login Successfully");
+        SendOrder();
+        DryCleanerAddOrderResponse dryCleanerAddOrderResponse = dryCleanerService.sendOrder(SendOrder());
+        assertThat(dryCleanerAddOrderResponse.getMessage()).contains("Order sent successfully");
+        Long id = dryCleanerAddOrderResponse.getDryCleanerId();
+        DryCleanerDeleteOrderResponse dryCleanerDeleteOrderResponse = dryCleanerService.deleteOrder(id);
+        assertThat(dryCleanerDeleteOrderResponse.getMessage()).contains("Order deleted successfully");
+    }
+}

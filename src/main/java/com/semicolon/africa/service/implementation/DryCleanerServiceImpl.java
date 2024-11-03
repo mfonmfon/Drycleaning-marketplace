@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static com.semicolon.africa.utils.Mapper.getDryCleanerUpdateOrderResponse;
 import static com.semicolon.africa.utils.Mapper.map;
 
@@ -30,13 +32,11 @@ public class DryCleanerServiceImpl implements DryCleanerService {
     private final RiderRepository riderRepository;
     private final PasswordEncoder passwordEncoder;
 
+
     @Override
     public DryCleanerAddOrderResponse sendOrder(DryCleanerAddOrderRequest dryCleanerAddOrderRequest) {
         validateDryCleanerEmailAddress(dryCleanerAddOrderRequest.getEmail());
         DryCleaner dryCleaner = new DryCleaner();
-        if(dryCleaner == null){
-            throw new InvalidOrEmptyFieldsException("Field must not be null");
-        }
         map(dryCleanerAddOrderRequest, dryCleaner);
         validateDryCleanerLogin(dryCleaner);
         dryCleanerRepository.save(dryCleaner);
@@ -71,8 +71,12 @@ public class DryCleanerServiceImpl implements DryCleanerService {
     }
 
     @Override
-    public DryCleanerDeleteOrderResponse deleteOrder(String id) {
-        return null;
+    public DryCleanerDeleteOrderResponse deleteOrder(Long id) {
+        DryCleaner dryCleaner  =  findDryCleanerById(id);
+        dryCleanerRepository.delete(dryCleaner);
+        DryCleanerDeleteOrderResponse dryCleanerDeleteOrderResponse = new DryCleanerDeleteOrderResponse();
+        dryCleanerDeleteOrderResponse.setMessage("Order deleted successfully");
+        return dryCleanerDeleteOrderResponse;
     }
 
     @Override
@@ -97,7 +101,7 @@ public class DryCleanerServiceImpl implements DryCleanerService {
         return dryCleanerRegisterResponse;
     }
     private void validateDryCleanerEmailAddress(String email) {
-        boolean isDryCleanerExist = dryCleanerRepository.existsByEmail(email);
+        boolean isDryCleanerExist = dryCleanerRepository.findDryCleanerByEmail(email).isPresent();;
         if(isDryCleanerExist){
             throw new DryCleanerAlreadyExistException("Dry Cleaner already exist");
         }
@@ -117,18 +121,48 @@ public class DryCleanerServiceImpl implements DryCleanerService {
         return loginDryCleanerResponse;
     }
 
-
     private void validateDryCleanerPassword(DryCleaner dryCleaner, String password) {
         if(passwordEncoder.matches(dryCleaner.getPassword(), password)) throw new InCorrectPassword("Invalid dry-cleaner password");
     }
-
     private DryCleaner findDryCleanerByEmail(String dryCleanerEmail) {
         return dryCleanerRepository.findDryCleanerByEmail(dryCleanerEmail)
                 .orElseThrow(()-> new DryCleanerNotFoundException("Dry Cleaner not found"));
     }
-
     @Override
     public CheckForRiderAvailabilty isAvailable() {
         return null;
+    }
+    @Override
+    public List<DryCleaner> findAllDryCleaners() {
+        return dryCleanerRepository.findAllBy();
+    }
+    @Override
+    public List<DryCleaner> findDryCleanerByFirstName(String firstName) {
+        return    dryCleanerRepository.findDryCleanerByFirstName(firstName);
+    }
+
+    @Override
+    public List<DryCleaner> findDryCleanerByLastName(String lastName) {
+        return dryCleanerRepository.findDryCleanerByLastName(lastName);
+    }
+
+    @Override
+    public List<DryCleaner> findDryCleanerByFirstNameAndLastName(String firstName, String lastName) {
+        return dryCleanerRepository.dryCleanersByFirstNameAndLastName(firstName, lastName);
+    }
+
+    @Override
+    public List<DryCleaner> findDryCleanerByCompanyName(String companyName) {
+        return dryCleanerRepository.findDryCleanerByCompanyName(companyName);
+    }
+
+    @Override
+    public List<DryCleaner> findDyrCleanerByPhoneNumber(String phoneNumber) {
+        return dryCleanerRepository.findDryCleanerByPhoneNumber(phoneNumber);
+    }
+
+    @Override
+    public Long countAllDryCleaners() {
+        return dryCleanerRepository.count();
     }
 }
