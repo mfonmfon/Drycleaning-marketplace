@@ -5,6 +5,7 @@ import com.semicolon.africa.DTOs.request.DryCleanerLoginRequest;
 import com.semicolon.africa.DTOs.request.DryCleanerRegisterRequest;
 import com.semicolon.africa.DTOs.request.DryCleanerUpdateOrderRequest;
 import com.semicolon.africa.DTOs.response.*;
+import com.semicolon.africa.data.model.Customer;
 import com.semicolon.africa.data.model.DryCleaner;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public interface DryCleanerService {
     DryCleanerDeleteOrderResponse deleteOrder(Long id);
     DryCleanerRegisterResponse register(DryCleanerRegisterRequest dryCleanerRegisterRequest);
     DryCleanerLoginResponse login(DryCleanerLoginRequest dryCleanerLoginRequest);
-    CheckForRiderAvailabilty isAvailable();
+//    CheckForRiderAvailabilty isAvailable();
     List<DryCleaner> findAllDryCleaners();
     List<DryCleaner> findDryCleanerByFirstName(String firstName);
     List<DryCleaner> findDryCleanerByLastName(String lastName);
@@ -23,5 +24,6 @@ public interface DryCleanerService {
     List<DryCleaner> findDryCleanerByCompanyName(String companyName);
     List<DryCleaner> findDyrCleanerByPhoneNumber(String phoneNumber);
     Long countAllDryCleaners();
+
 
 }

@@ -7,6 +7,7 @@ import com.semicolon.africa.DTOs.request.DryCleanerRegisterRequest;
 import com.semicolon.africa.DTOs.request.DryCleanerUpdateOrderRequest;
 import com.semicolon.africa.DTOs.response.*;
 import com.semicolon.africa.config.PasswordConfiguration;
+import com.semicolon.africa.data.model.Customer;
 import com.semicolon.africa.data.model.DryCleaner;
 import com.semicolon.africa.data.model.Rider;
 import com.semicolon.africa.data.repository.DryCleanerRepository;
@@ -36,6 +37,10 @@ public class DryCleanerServiceImpl implements DryCleanerService {
     @Override
     public DryCleanerAddOrderResponse sendOrder(DryCleanerAddOrderRequest dryCleanerAddOrderRequest) {
         validateDryCleanerEmailAddress(dryCleanerAddOrderRequest.getEmail());
+        Rider rider = riderRepository.findRiderById(dryCleanerAddOrderRequest.getId());
+        if(rider == null){
+            throw new NoRiderWasFoundException("No Rider was found");
+        }
         DryCleaner dryCleaner = new DryCleaner();
         map(dryCleanerAddOrderRequest, dryCleaner);
         validateDryCleanerLogin(dryCleaner);
@@ -64,12 +69,11 @@ public class DryCleanerServiceImpl implements DryCleanerService {
         DryCleanerUpdateOrderResponse dryCleanerUpdateOrderResponse = getDryCleanerUpdateOrderResponse();
         return dryCleanerUpdateOrderResponse;
     }
-    
+
     private DryCleaner findDryCleanerById(Long dryCleanerId) {
         return dryCleanerRepository.findDryCleanerById(dryCleanerId).
                 orElseThrow(()-> new DryCleanerIdNotFoundException("Dry cleaner not found id"));
     }
-
     @Override
     public DryCleanerDeleteOrderResponse deleteOrder(Long id) {
         DryCleaner dryCleaner  =  findDryCleanerById(id);
@@ -106,6 +110,7 @@ public class DryCleanerServiceImpl implements DryCleanerService {
             throw new DryCleanerAlreadyExistException("Dry Cleaner already exist");
         }
     }
+
     @Override
     public DryCleanerLoginResponse login(DryCleanerLoginRequest dryCleanerLoginRequest) {
         DryCleaner dryCleaner = findDryCleanerByEmail(dryCleanerLoginRequest.getEmail());
@@ -128,10 +133,7 @@ public class DryCleanerServiceImpl implements DryCleanerService {
         return dryCleanerRepository.findDryCleanerByEmail(dryCleanerEmail)
                 .orElseThrow(()-> new DryCleanerNotFoundException("Dry Cleaner not found"));
     }
-    @Override
-    public CheckForRiderAvailabilty isAvailable() {
-        return null;
-    }
+
     @Override
     public List<DryCleaner> findAllDryCleaners() {
         return dryCleanerRepository.findAllBy();
@@ -140,27 +142,22 @@ public class DryCleanerServiceImpl implements DryCleanerService {
     public List<DryCleaner> findDryCleanerByFirstName(String firstName) {
         return    dryCleanerRepository.findDryCleanerByFirstName(firstName);
     }
-
     @Override
     public List<DryCleaner> findDryCleanerByLastName(String lastName) {
-        return dryCleanerRepository.findDryCleanerByLastName(lastName);
+        return dryCleanerRepository.findDryCleanersByLastName(lastName);
     }
-
     @Override
     public List<DryCleaner> findDryCleanerByFirstNameAndLastName(String firstName, String lastName) {
-        return dryCleanerRepository.dryCleanersByFirstNameAndLastName(firstName, lastName);
+        return dryCleanerRepository.findDryCleanersByFirstNameAndLastName(firstName, lastName);
     }
-
     @Override
     public List<DryCleaner> findDryCleanerByCompanyName(String companyName) {
         return dryCleanerRepository.findDryCleanerByCompanyName(companyName);
     }
-
     @Override
     public List<DryCleaner> findDyrCleanerByPhoneNumber(String phoneNumber) {
         return dryCleanerRepository.findDryCleanerByPhoneNumber(phoneNumber);
     }
-
     @Override
     public Long countAllDryCleaners() {
         return dryCleanerRepository.count();

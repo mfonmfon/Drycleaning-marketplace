@@ -32,8 +32,8 @@ public class DryCleanerController {
           return new ResponseEntity<>(new ApiResponse(false, exception.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
-    @PostMapping("/loginDryCleaner")
-    public ResponseEntity<?> loginDryCleaner(@RequestBody DryCleanerLoginRequest dryCleanerLoginRequest){
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody DryCleanerLoginRequest dryCleanerLoginRequest){
         try{
             DryCleanerLoginResponse dryCleanerLoginResponse = dryCleanerService.login(dryCleanerLoginRequest);
             return new ResponseEntity<>(new ApiResponse(true, dryCleanerLoginResponse), HttpStatus.OK);
@@ -42,14 +42,14 @@ public class DryCleanerController {
         }
     }
 
-    @PostMapping("")
+    @PostMapping("/sendOrder")
     public ResponseEntity<?> sendOrder(@RequestBody DryCleanerAddOrderRequest dryCleanerAddOrderRequest){
         try{
             DryCleanerAddOrderResponse dryCleanerAddOrderResponse = dryCleanerService.sendOrder(dryCleanerAddOrderRequest);
             return new ResponseEntity<>(new ApiResponse(true, dryCleanerAddOrderResponse), HttpStatus.OK);
         }
         catch(Exception exception){
-            return new ResponseEntity<>(new ApiResponse(false, exception), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ApiResponse(false, exception.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -83,7 +83,7 @@ public class DryCleanerController {
            return new ResponseEntity<>(new ApiResponse(false, exceptions.getMessage()), HttpStatus.BAD_REQUEST);
        }
     }
-    @GetMapping()
+    @GetMapping("/firstName/")
     public ResponseEntity<?> searchForDryCleanerByFirstName(@PathVariable String firstName){
         try{
             List<DryCleaner> findByFirstName = dryCleanerService.findDryCleanerByFirstName(firstName);
@@ -93,7 +93,7 @@ public class DryCleanerController {
             return new ResponseEntity<>(new ApiResponse(false, exception.getMessage()),HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping
+    @GetMapping("/lastName/")
     public ResponseEntity<?> findDryCleanerByLastName(@PathVariable String lastName){
         try{
             List<DryCleaner> searchDryCleanerByLastName = dryCleanerService.findDryCleanerByLastName(lastName);
@@ -102,8 +102,8 @@ public class DryCleanerController {
             return new ResponseEntity<>(new ApiResponse(false, exception.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping()
-    public ResponseEntity<?> findDryCleanerByFirstNameAndLastName(String firstName, String lastName){
+    @GetMapping("/firstName/lastName/")
+    public ResponseEntity<?> findDryCleanerByFirstNameAndLastName(@PathVariable String firstName, @PathVariable String lastName){
         try{
             List<DryCleaner> searchDryCleanerByFirstNameAndLastName = dryCleanerService.findDryCleanerByFirstNameAndLastName(firstName,lastName);
             return new ResponseEntity<>(new ApiResponse(true, searchDryCleanerByFirstNameAndLastName),HttpStatus.OK);
@@ -112,8 +112,8 @@ public class DryCleanerController {
             return new ResponseEntity<>(new ApiResponse(false, exception.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping
-    public ResponseEntity<?> findDryCleanerByPhoneNumber(String phoneNumber){
+    @GetMapping("/phoneNumber/")
+    public ResponseEntity<?> findDryCleanerByPhoneNumber(@PathVariable String phoneNumber){
         try{
             List<DryCleaner> searchDryCleanerByPhoneNumber = dryCleanerService.findDyrCleanerByPhoneNumber(phoneNumber);
             return new ResponseEntity<>(new ApiResponse(true, searchDryCleanerByPhoneNumber), HttpStatus.OK);
@@ -122,8 +122,8 @@ public class DryCleanerController {
             return new ResponseEntity<>(new ApiResponse(false, exception.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping
-    public ResponseEntity<?> findDryCleanerByCompanyName(String companyName){
+    @GetMapping("/companyName/")
+    public ResponseEntity<?> findDryCleanerByCompanyName(@PathVariable String companyName){
         try{
             List<DryCleaner> searchDryCleanerByCompanyName = dryCleanerService.findDryCleanerByCompanyName(companyName);
             return new ResponseEntity<>(new ApiResponse(true, searchDryCleanerByCompanyName),HttpStatus.OK);

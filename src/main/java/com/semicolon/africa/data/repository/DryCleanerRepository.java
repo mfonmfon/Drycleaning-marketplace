@@ -15,9 +15,9 @@ public interface DryCleanerRepository extends JpaRepository<DryCleaner, Long> {
 
     List<DryCleaner> findDryCleanerByFirstName(String firstName);
 
-    List<DryCleaner> findDryCleanerByLastName(String lastName);
+    List<DryCleaner> findDryCleanersByLastName(String lastName);
 
-    List<DryCleaner> dryCleanersByFirstNameAndLastName(String firstName, String lastName);
+    List<DryCleaner> findDryCleanersByFirstNameAndLastName(String firstName, String lastName);
 
     List<DryCleaner> findDryCleanerByCompanyName(String companyName);
 
