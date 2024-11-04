@@ -20,6 +20,8 @@ public class DryCleaner {
     private String password;
     private boolean isLoggedIn;
     @OneToMany
+    private List<OrderPlacement> orderPlacement;
+    @OneToMany
     private List<Customer> customers;
     @OneToMany
     private List<Rider> riders;

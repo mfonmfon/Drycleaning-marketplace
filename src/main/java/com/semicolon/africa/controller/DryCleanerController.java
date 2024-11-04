@@ -1,9 +1,6 @@
 package com.semicolon.africa.controller;
 
-import com.semicolon.africa.DTOs.request.DryCleanerAddOrderRequest;
-import com.semicolon.africa.DTOs.request.DryCleanerLoginRequest;
-import com.semicolon.africa.DTOs.request.DryCleanerRegisterRequest;
-import com.semicolon.africa.DTOs.request.DryCleanerUpdateOrderRequest;
+import com.semicolon.africa.DTOs.request.*;
 import com.semicolon.africa.DTOs.response.*;
 import com.semicolon.africa.data.model.DryCleaner;
 import com.semicolon.africa.service.interfaces.DryCleanerService;
@@ -43,9 +40,9 @@ public class DryCleanerController {
     }
 
     @PostMapping("/sendOrder")
-    public ResponseEntity<?> sendOrder(@RequestBody DryCleanerAddOrderRequest dryCleanerAddOrderRequest){
+    public ResponseEntity<?> sendOrder(@RequestBody PlaceOrderRequest dryCleanerAddOrderRequest){
         try{
-            DryCleanerAddOrderResponse dryCleanerAddOrderResponse = dryCleanerService.sendOrder(dryCleanerAddOrderRequest);
+            PlaceOrderResponse dryCleanerAddOrderResponse = dryCleanerService.sendOrder(dryCleanerAddOrderRequest);
             return new ResponseEntity<>(new ApiResponse(true, dryCleanerAddOrderResponse), HttpStatus.OK);
         }
         catch(Exception exception){

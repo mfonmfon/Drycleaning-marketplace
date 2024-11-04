@@ -1,24 +1,25 @@
 package com.semicolon.africa.service.implementation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.semicolon.africa.DTOs.request.DryCleanerAddOrderRequest;
-import com.semicolon.africa.DTOs.request.DryCleanerLoginRequest;
-import com.semicolon.africa.DTOs.request.DryCleanerRegisterRequest;
-import com.semicolon.africa.DTOs.request.DryCleanerUpdateOrderRequest;
+import com.semicolon.africa.DTOs.request.*;
 import com.semicolon.africa.DTOs.response.*;
 import com.semicolon.africa.config.PasswordConfiguration;
 import com.semicolon.africa.data.model.Customer;
 import com.semicolon.africa.data.model.DryCleaner;
+import com.semicolon.africa.data.model.OrderPlacement;
 import com.semicolon.africa.data.model.Rider;
 import com.semicolon.africa.data.repository.DryCleanerRepository;
+import com.semicolon.africa.data.repository.OrderRepository;
 import com.semicolon.africa.data.repository.RiderRepository;
 import com.semicolon.africa.exception.*;
 import com.semicolon.africa.service.interfaces.DryCleanerService;
+import com.semicolon.africa.service.interfaces.OrderPlacementService;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.semicolon.africa.utils.Mapper.getDryCleanerUpdateOrderResponse;
@@ -32,24 +33,27 @@ public class DryCleanerServiceImpl implements DryCleanerService {
     private final ObjectMapper mapper;
     private final RiderRepository riderRepository;
     private final PasswordEncoder passwordEncoder;
+    private final OrderPlacementService orderPlacementService;
+    private final OrderRepository orderRepository;
 
 
     @Override
-    public DryCleanerAddOrderResponse sendOrder(DryCleanerAddOrderRequest dryCleanerAddOrderRequest) {
-        validateDryCleanerEmailAddress(dryCleanerAddOrderRequest.getEmail());
-        Rider rider = riderRepository.findRiderById(dryCleanerAddOrderRequest.getId());
-        if(rider == null){
-            throw new NoRiderWasFoundException("No Rider was found");
-        }
-        DryCleaner dryCleaner = new DryCleaner();
-        map(dryCleanerAddOrderRequest, dryCleaner);
+    public PlaceOrderResponse sendOrder(PlaceOrderRequest placeOrderRequest) {
+        PlaceOrderResponse placeOrderResponse = orderPlacementService.placeOrder(placeOrderRequest);
+        DryCleaner dryCleaner = findDryCleanerById(placeOrderRequest.getDryCleanerId());
+        validateDryCleanerEmailAddress(dryCleaner.getEmail());
+        OrderPlacement orderPlacement = findOrderPlacementById(placeOrderRequest.getOrderPlacementId());
+        List<OrderPlacement> orderPlacementList = dryCleaner.getOrderPlacement();
+        orderPlacementList.add(orderPlacement);
         validateDryCleanerLogin(dryCleaner);
         dryCleanerRepository.save(dryCleaner);
-        DryCleanerAddOrderResponse dryCleanerAddOrderResponse = new DryCleanerAddOrderResponse();
-        dryCleanerAddOrderResponse.setDryCleanerId(dryCleaner.getId());
-        dryCleanerAddOrderResponse.setMessage("Ordered sent successfully");
-        return dryCleanerAddOrderResponse;
+        placeOrderResponse.setMessage("Ordered sent successfully");
+        return placeOrderResponse;
     }
+    private OrderPlacement findOrderPlacementById(Long orderPlacementId) {
+        return orderRepository.findOrderById(orderPlacementId);
+    }
+
     private void validateDryCleanerLogin(DryCleaner  dryCleaner) {
         if(!dryCleaner.isLoggedIn())throw new DryCleanerNotLoggedInException("Login first");
     }

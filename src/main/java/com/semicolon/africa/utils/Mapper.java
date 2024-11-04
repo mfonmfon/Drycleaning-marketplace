@@ -2,7 +2,9 @@ package com.semicolon.africa.utils;
 
 import com.semicolon.africa.DTOs.request.DryCleanerAddOrderRequest;
 import com.semicolon.africa.DTOs.response.DryCleanerUpdateOrderResponse;
+import com.semicolon.africa.DTOs.response.PlaceOrderResponse;
 import com.semicolon.africa.data.model.DryCleaner;
+import com.semicolon.africa.data.model.OrderPlacement;
 
 public class Mapper {
 
@@ -24,5 +26,17 @@ public class Mapper {
         return dryCleanerUpdateOrderResponse;
     }
 
+
+    public static PlaceOrderResponse placeOrderResponseMapper(OrderPlacement orderPlacement) {
+        PlaceOrderResponse placeOrderResponse = new PlaceOrderResponse();
+        placeOrderResponse.setOrderId(orderPlacement.getId());
+        placeOrderResponse.setServiceType(orderPlacement.getServiceType());
+        placeOrderResponse.setItems(orderPlacement.getItems());
+        placeOrderResponse.setPrice(orderPlacement.getPrice());
+        placeOrderResponse.setQuantity(orderPlacement.getQuantity());
+        placeOrderResponse.setDateOrdered(orderPlacement.getDateOrdered());
+        placeOrderResponse.setMessage("Order placed successfully");
+        return placeOrderResponse;
+    }
 
 }
