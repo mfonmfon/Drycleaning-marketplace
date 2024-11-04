@@ -1,9 +1,6 @@
 package com.semicolon.africa.service.interfaces;
 
-import com.semicolon.africa.DTOs.request.CustomerLoginRequest;
-import com.semicolon.africa.DTOs.request.CustomerRegistrationRequest;
-import com.semicolon.africa.DTOs.request.CustomerSendOrderRequest;
-import com.semicolon.africa.DTOs.request.CustomerUpdateOrderRequest;
+import com.semicolon.africa.DTOs.request.*;
 import com.semicolon.africa.DTOs.response.*;
 import com.semicolon.africa.data.model.Customer;
 
@@ -14,9 +11,9 @@ public interface CustomerService {
 
     CustomerRegistrationResponse register(CustomerRegistrationRequest customerRegistrationRequest);
 
-    CustomerSendOrderResponse sendOrder(CustomerSendOrderRequest cuatomerSendOrderRequest);
+    PlaceOrderResponse sendOrder(PlaceOrderRequest customerSendOrderRequest);
 
-    CustomerUpdateOrderResponse updateOrder(CustomerUpdateOrderRequest cuatomerUpdateOrderRequest);
+    CustomerUpdateOrderResponse updateOrder(CustomerUpdateOrderRequest customerUpdateOrderRequest);
 
     DeleteOrderResponse deleteOrder(Long id);
 

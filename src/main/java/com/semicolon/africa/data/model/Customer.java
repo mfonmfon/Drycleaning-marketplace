@@ -26,6 +26,8 @@ public class Customer {
     @NotBlank(message = "PhoneNumber is required")
     @Size(min = 1, max = 11)
     private String phoneNumber;
+    private String password;
+    private boolean isLoggedIn;
     @OneToMany
     private List<OrderPlacement> orderPlacement;
     

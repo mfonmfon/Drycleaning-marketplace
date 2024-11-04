@@ -17,4 +17,5 @@ public class CustomerRegistrationRequest {
     @NotBlank(message = "PhoneNumber is required")
     @Size(min = 1, max = 11)
     private String phoneNumber;
+    private String password;
 }

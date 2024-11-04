@@ -1,2 +1,2 @@
-package com.semicolon.africa.DTOs.response;public class DryCleanerLogoutRequest {
+package com.semicolon.africa.DTOs.request;public class DryCleanerLogoutRequest {
 }
