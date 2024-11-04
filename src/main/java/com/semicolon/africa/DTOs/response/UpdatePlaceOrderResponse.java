@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class UpdatePlaceOrderResponse {
+    private Long orderId;
     @Enumerated(EnumType.STRING)
     private ServiceType serviceType;
     @Enumerated(EnumType.STRING)

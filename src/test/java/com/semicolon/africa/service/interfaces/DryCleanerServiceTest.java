@@ -48,7 +48,7 @@ class DryCleanerServiceTest {
 
 //    @Test
 //    public void testThatWhenDryCleanerLeavesInputUnfilled_throwEmptyFilledException(){
-//       DryCleanerAddOrderRequest dryCleanerAddOrderRequest = new DryCleanerAddOrderRequest();
+//       PostServiceResponse dryCleanerAddOrderRequest = new PostServiceResponse();
 //       dryCleanerAddOrderRequest.setFirstName("me");
 //       dryCleanerAddOrderRequest.setLastName("last name");
 //       dryCleanerAddOrderRequest.setEmail("name@gmail.com");
@@ -129,7 +129,7 @@ class DryCleanerServiceTest {
 //        dryCleanerAddOrderRequest.setEmail("mfonm3579@gmail.com");
 //        dryCleanerAddOrderRequest.setPhoneNumber("08123115688");
 //        dryCleanerAddOrderRequest.setCompanyName("FonDryer");
-//        DryCleanerAddOrderResponse dryCleanerAddOrderResponse = dryCleanerService.sendOrder(dryCleanerAddOrderRequest);
+//        PostServiceRequest dryCleanerAddOrderResponse = dryCleanerService.sendOrder(dryCleanerAddOrderRequest);
 //        assertThat(dryCleanerAddOrderResponse.getMessage()).contains("Order sent successfully");
         DryCleanerUpdateOrderRequest dryCleanerUpdateOrderRequest = new DryCleanerUpdateOrderRequest();
 //        dryCleanerUpdateOrderRequest.setDryCleanerId(2L);

@@ -1,6 +1,6 @@
 package com.semicolon.africa.utils;
 
-import com.semicolon.africa.DTOs.request.DryCleanerAddOrderRequest;
+import com.semicolon.africa.DTOs.response.PostServiceResponse;
 import com.semicolon.africa.DTOs.response.DryCleanerUpdateOrderResponse;
 import com.semicolon.africa.DTOs.response.PlaceOrderResponse;
 import com.semicolon.africa.data.model.DryCleaner;
@@ -8,13 +8,13 @@ import com.semicolon.africa.data.model.OrderPlacement;
 
 public class Mapper {
 
-    public static void map(DryCleanerAddOrderRequest dryCleanerAddOrderRequest, DryCleaner dryCleaner) {
-        dryCleaner.setFirstName(dryCleanerAddOrderRequest.getFirstName());
-        dryCleaner.setLastName(dryCleanerAddOrderRequest.getLastName());
-        dryCleaner.setEmail((dryCleanerAddOrderRequest.getEmail()));
-        dryCleaner.setPhoneNumber(dryCleanerAddOrderRequest.getPhoneNumber());
-        dryCleaner.setCompanyName(dryCleanerAddOrderRequest.getCompanyName());
-    }
+//    public static void map(PostServiceResponse dryCleanerAddOrderRequest, DryCleaner dryCleaner) {
+//        dryCleaner.setFirstName(dryCleanerAddOrderRequest.getFirstName());
+//        dryCleaner.setLastName(dryCleanerAddOrderRequest.getLastName());
+//        dryCleaner.setEmail((dryCleanerAddOrderRequest.getEmail()));
+//        dryCleaner.setPhoneNumber(dryCleanerAddOrderRequest.getPhoneNumber());
+//        dryCleaner.setCompanyName(dryCleanerAddOrderRequest.getCompanyName());
+//    }
 
     public static DryCleanerUpdateOrderResponse getDryCleanerUpdateOrderResponse() {
         DryCleanerUpdateOrderResponse dryCleanerUpdateOrderResponse = new DryCleanerUpdateOrderResponse();
