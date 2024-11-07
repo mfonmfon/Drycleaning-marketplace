@@ -3,9 +3,12 @@ package com.semicolon.africa.service.implementation;
 import com.semicolon.africa.DTOs.request.*;
 import com.semicolon.africa.DTOs.response.*;
 import com.semicolon.africa.data.model.Customer;
+import com.semicolon.africa.data.model.OrderPlacement;
 import com.semicolon.africa.data.repository.CustomerRepository;
+import com.semicolon.africa.data.repository.OrderRepository;
 import com.semicolon.africa.exception.*;
 import com.semicolon.africa.service.interfaces.CustomerService;
+import com.semicolon.africa.service.interfaces.OrderPlacementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     private final PasswordEncoder passwordEncoder;
     private final CustomerRepository customerRepository;
+    private final OrderRepository orderRepository;
+    private final OrderPlacementService orderPlacementService;
 
     private final Pattern VALIDATE_CUSTOMER_EMAIL = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
     private final Pattern VALIDATE_CUSTOMER_PHONE_NUMBER = Pattern.compile("\\+?[0-9]{1,3}?[ -]?[0-9]{9}$");
@@ -87,13 +92,23 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public PlaceOrderResponse sendOrder(PlaceOrderRequest customerSendOrderRequest) {
-        Customer customer = new Customer();
+        PlaceOrderResponse placeOrderResponse =  orderPlacementService.placeOrder(customerSendOrderRequest);
+        Customer customer = findCustomerById(customerSendOrderRequest.getCustomerId());
+        OrderPlacement orderPlacement = findOrderPlacementById(customerSendOrderRequest.getOrderPlacementId());
+        List<OrderPlacement> orderPlacementList = customer.getOrderPlacement();
+        orderPlacementList.add(orderPlacement);
         validateCustomerIsLoggedIn(customer);
-        return null;
+        customerRepository.save(customer);
+        placeOrderResponse.setMessage("Order sent");
+        return placeOrderResponse;
     }
 
+    private OrderPlacement findOrderPlacementById(Long id) {
+        return orderRepository.findOrderById(id)
+                .orElseThrow(()-> new OrderIdNotFoundException("OrderId not found"));
+    }
     private void validateCustomerIsLoggedIn(Customer customer) {
-        if(!customer.isLoggedIn())throw new CustomerNotLoggedInException("You are not logged in");
+        if(customer.isLoggedIn())throw new CustomerNotLoggedInException("You are not logged in");
     }
 
     @Override
@@ -118,7 +133,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Customer findCustomerById(Long id) {
-        return customerRepository.findCustomersById(id)
+        return customerRepository.findCustomerById(id)
                 .orElseThrow(()-> new CustomerNotFoundException("Customer not found"));
     }
 

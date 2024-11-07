@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -118,8 +119,8 @@ class CustomerServiceTest {
         placeOrderRequest.setItems(ItemType.TROUSERS);
         placeOrderRequest.setPrice(BigDecimal.valueOf(100000));
         placeOrderRequest.setQuantity(20);
+        placeOrderRequest.setDateOrdered(LocalDateTime.now());
         PlaceOrderResponse placeOrderResponse = customerService.sendOrder(placeOrderRequest);
         assertThat(placeOrderResponse.getMessage()).contains("Order sent");
-
     }
 }

@@ -39,8 +39,9 @@ public class DryCleanerServiceImpl implements DryCleanerService {
 //        placeOrderResponse.setMessage("Ordered sent successfully");
 //        return placeOrderResponse;
 //    }
+
     private OrderPlacement findOrderPlacementById(Long orderPlacementId) {
-        return orderRepository.findOrderById(orderPlacementId);
+        return orderRepository.findOrderById(orderPlacementId).orElseThrow(()-> new OrderIdNotFoundException("Order placement npt fpund "));
     }
 
     private void validateDryCleanerLogin(DryCleaner  dryCleaner) {

@@ -5,8 +5,11 @@ import com.semicolon.africa.DTOs.request.UpdatePlaceOrderRequest;
 import com.semicolon.africa.DTOs.response.DeletePlacedOrderResponse;
 import com.semicolon.africa.DTOs.response.PlaceOrderResponse;
 import com.semicolon.africa.DTOs.response.UpdatePlaceOrderResponse;
+import com.semicolon.africa.data.model.Customer;
 import com.semicolon.africa.data.model.OrderPlacement;
+import com.semicolon.africa.data.repository.CustomerRepository;
 import com.semicolon.africa.data.repository.OrderRepository;
+import com.semicolon.africa.exception.CustomerNotFoundException;
 import com.semicolon.africa.exception.OrderIdNotFoundException;
 import com.semicolon.africa.exception.OrderNotFoundException;
 import com.semicolon.africa.service.interfaces.OrderPlacementService;
@@ -19,8 +22,11 @@ import static com.semicolon.africa.utils.Mapper.placeOrderResponseMapper;
 @RequiredArgsConstructor
 public class OrderPlacementServiceImpl implements OrderPlacementService {
     private final OrderRepository orderRepository;
+    private final CustomerRepository customerRepository;
     @Override
     public PlaceOrderResponse placeOrder(PlaceOrderRequest placeOrderRequest) {
+        Customer customer = findCustomerById(placeOrderRequest.getCustomerId());
+        customerRepository.save(customer);
         OrderPlacement orderPlacement = new OrderPlacement();
         orderPlacement.setServiceType(placeOrderRequest.getServiceType());
         orderPlacement.setItems(placeOrderRequest.getItems());
@@ -31,10 +37,14 @@ public class OrderPlacementServiceImpl implements OrderPlacementService {
         return placeOrderResponseMapper(orderPlacement);
     }
 
+    private Customer findCustomerById(Long customerId) {
+        return customerRepository.findCustomerById(customerId)
+                .orElseThrow(()-> new CustomerNotFoundException("Customer not found"));
+    }
+
     @Override
     public UpdatePlaceOrderResponse updateOrder(UpdatePlaceOrderRequest placeOrderRequest) {
         OrderPlacement orderPlacement = findOrderPlacementById(placeOrderRequest.getOrderId());
-        orderPlacement.setId(placeOrderRequest.getOrderId());
         orderPlacement.setItems(placeOrderRequest.getItems());
         orderPlacement.setServiceType(placeOrderRequest.getServiceType());
         orderPlacement.setPrice(placeOrderRequest.getPrice());

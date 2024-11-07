@@ -20,7 +20,6 @@ public class DryCleaner {
     private Long id;
     private String fullName;
     private String email;
-//    private Image image;
     private String companyName;
     private String phoneNumber;
     private String password;
@@ -31,8 +30,7 @@ public class DryCleaner {
     private LocalDateTime datePosted;
     @OneToMany
     private List<OrderPlacement> orderPlacement;
-    @OneToMany
-    private List<Customer> customers;
+
 //    @OneToMany
 //    private List<Rider> riders;
 }

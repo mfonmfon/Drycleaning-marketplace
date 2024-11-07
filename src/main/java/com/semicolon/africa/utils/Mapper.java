@@ -32,6 +32,7 @@ public class Mapper {
 
     public static PlaceOrderResponse placeOrderResponseMapper(OrderPlacement orderPlacement) {
         PlaceOrderResponse placeOrderResponse = new PlaceOrderResponse();
+        placeOrderResponse.setCustomerId(orderPlacement.getCustomerId());
         placeOrderResponse.setOrderId(orderPlacement.getId());
         placeOrderResponse.setServiceType(orderPlacement.getServiceType());
         placeOrderResponse.setItems(orderPlacement.getItems());

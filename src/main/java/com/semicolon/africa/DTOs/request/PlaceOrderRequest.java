@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class PlaceOrderRequest {
+    private Long customerId;
     private Long orderPlacementId;
-    private Long dryCleanerId;
     @Enumerated(EnumType.STRING)
     private ServiceType serviceType;
     @Enumerated(EnumType.STRING)

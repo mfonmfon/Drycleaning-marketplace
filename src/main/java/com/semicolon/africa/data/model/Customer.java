@@ -30,5 +30,6 @@ public class Customer {
     private boolean isLoggedIn;
     @OneToMany
     private List<OrderPlacement> orderPlacement;
+
     
 }
